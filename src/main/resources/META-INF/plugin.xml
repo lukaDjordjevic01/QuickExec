@@ -11,5 +11,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.lukadjordjevic01.quickexec.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.lukadjordjevic01.quickexec.startup.MyProjectActivity" />
+        <configurationType implementation="com.github.lukadjordjevic01.quickexec.configurationComponent.ExecutableRunnerConfigurationType"/>
     </extensions>
 </idea-plugin>
