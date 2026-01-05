@@ -7,6 +7,8 @@ import com.intellij.openapi.project.Project
 
 class ExecutableRunnerConfigurationFactory(type: ConfigurationType) : ConfigurationFactory(type) {
 
+    override fun getId(): String = "ExecutableRunnerConfigurationFactory"
+
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
         return ExecutableRunnerConfiguration(project, this, "Executable Runner")
     }
