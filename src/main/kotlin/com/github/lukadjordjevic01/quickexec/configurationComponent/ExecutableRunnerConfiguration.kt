@@ -2,6 +2,8 @@ package com.github.lukadjordjevic01.quickexec.configurationComponent
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.*
+import com.intellij.execution.process.KillableColoredProcessHandler
+import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
@@ -48,8 +50,29 @@ class ExecutableRunnerConfiguration(
         }
     }
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
-        return null
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
+        return object : CommandLineState(environment) {
+            override fun startProcess(): ProcessHandler {
+
+                val executablePath = when (executableType) {
+                    ExecutableType.RUSTC -> "rustc"
+                    ExecutableType.CARGO -> "cargo"
+                    ExecutableType.CUSTOM -> customExecutablePath
+                }
+
+                val commandLine = GeneralCommandLine().apply {
+                    exePath = executablePath
+
+                    if (programArguments.isNotBlank()) {
+                        addParameters(parseArguments(programArguments))
+                    }
+
+                    withWorkDirectory(project.basePath)
+                }
+
+                return KillableColoredProcessHandler(commandLine)
+            }
+        }
     }
 
     override fun writeExternal(element: Element) {
@@ -87,5 +110,9 @@ class ExecutableRunnerConfiguration(
             val executable = File(pathDir, executableName)
             executable.exists() && executable.canExecute()
         }
+    }
+
+    private fun parseArguments(args: String): List<String> {
+        return args.trim().split("\\s+".toRegex()).filter { it.isNotEmpty() }
     }
 }
