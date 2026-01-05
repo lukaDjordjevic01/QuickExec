@@ -18,6 +18,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
     private val programArgumentsField = JBTextField()
 
     private val panel: JPanel
+    private var currentConfiguration: ExecutableRunnerConfiguration? = null
 
     init {
         val fileChooserDescriptor = FileChooserDescriptor(
@@ -59,20 +60,48 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
     }
 
     override fun resetEditorFrom(configuration: ExecutableRunnerConfiguration) {
+        currentConfiguration = configuration
         executableTypeComboBox.selectedItem = configuration.executableType
-        executablePathField.text = configuration.customExecutablePath
+
+        executablePathField.text = when (configuration.executableType) {
+            ExecutableRunnerConfiguration.ExecutableType.RUSTC ->
+                configuration.resolveExecutablePath("rustc") ?: ""
+            ExecutableRunnerConfiguration.ExecutableType.CARGO ->
+                configuration.resolveExecutablePath("cargo") ?: ""
+            ExecutableRunnerConfiguration.ExecutableType.CUSTOM ->
+                configuration.customExecutablePath
+        }
+
         programArgumentsField.text = configuration.programArguments
         updatePathFieldState()
     }
 
     override fun applyEditorTo(configuration: ExecutableRunnerConfiguration) {
         configuration.executableType = executableTypeComboBox.selectedItem as ExecutableRunnerConfiguration.ExecutableType
-        configuration.customExecutablePath = executablePathField.text
+
+        if (configuration.executableType == ExecutableRunnerConfiguration.ExecutableType.CUSTOM) {
+            configuration.customExecutablePath = executablePathField.text
+        }
+
         configuration.programArguments = programArgumentsField.text
     }
 
     private fun updatePathFieldState() {
         val selectedType = executableTypeComboBox.selectedItem as? ExecutableRunnerConfiguration.ExecutableType
+        val config = currentConfiguration
+
+        if (config != null) {
+            executablePathField.text = when (selectedType) {
+                ExecutableRunnerConfiguration.ExecutableType.RUSTC ->
+                    config.resolveExecutablePath("rustc") ?: ""
+                ExecutableRunnerConfiguration.ExecutableType.CARGO ->
+                    config.resolveExecutablePath("cargo") ?: ""
+                ExecutableRunnerConfiguration.ExecutableType.CUSTOM ->
+                    config.customExecutablePath
+                else -> ""
+            }
+        }
+
         executablePathField.isEnabled = selectedType == ExecutableRunnerConfiguration.ExecutableType.CUSTOM
     }
 }
