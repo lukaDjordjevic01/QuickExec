@@ -6,6 +6,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import org.jdom.Element
+import java.io.File
 
 class ExecutableRunnerConfiguration(
     project: Project,
@@ -21,6 +22,30 @@ class ExecutableRunnerConfiguration(
         ExecutableRunnerConfigurationEditor()
 
     override fun checkConfiguration() {
+        when (executableType) {
+            ExecutableType.RUSTC -> {
+                if (!isExecutableInPath("rustc")) {
+                    throw RuntimeConfigurationError("Rustc not found in PATH. Please install Rust or select a different executable type.")
+                }
+            }
+            ExecutableType.CARGO -> {
+                if (!isExecutableInPath("cargo")) {
+                    throw RuntimeConfigurationError("Cargo not found in PATH. Please install Cargo or select a different executable type.")
+                }
+            }
+            ExecutableType.CUSTOM -> {
+                if (customExecutablePath.isBlank()) {
+                    throw RuntimeConfigurationError("Executable path is not specified")
+                }
+                val file = File(customExecutablePath)
+                if (!file.exists()) {
+                    throw RuntimeConfigurationError("Executable not found: $customExecutablePath")
+                }
+                if (!file.canExecute()) {
+                    throw RuntimeConfigurationWarning("File may not be executable: $customExecutablePath")
+                }
+            }
+        }
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
@@ -51,5 +76,16 @@ class ExecutableRunnerConfiguration(
         RUSTC,
         CARGO,
         CUSTOM
+    }
+
+    private fun isExecutableInPath(executableName: String): Boolean {
+        val pathEnv = System.getenv("PATH") ?: return false
+        val pathSeparator = File.pathSeparator
+        val paths = pathEnv.split(pathSeparator)
+
+        return paths.any { pathDir ->
+            val executable = File(pathDir, executableName)
+            executable.exists() && executable.canExecute()
+        }
     }
 }
