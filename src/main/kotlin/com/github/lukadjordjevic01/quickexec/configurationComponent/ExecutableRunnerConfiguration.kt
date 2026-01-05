@@ -5,8 +5,10 @@ import com.intellij.execution.configurations.*
 import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.util.ProgramParametersUtil
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
+import com.intellij.util.execution.ParametersListUtil
 import org.jdom.Element
 import java.io.File
 
@@ -112,7 +114,23 @@ class ExecutableRunnerConfiguration(
         }
     }
 
+
+    fun resolveExecutablePath(executableName: String): String? {
+        val pathEnv = System.getenv("PATH") ?: return null
+        val pathSeparator = File.pathSeparator
+        val paths = pathEnv.split(pathSeparator)
+
+        for (pathDir in paths) {
+            val executable = File(pathDir, executableName)
+            if (executable.exists() && executable.canExecute()) {
+                return executable.absolutePath
+            }
+        }
+        return null
+    }
+
+    
     private fun parseArguments(args: String): List<String> {
-        return args.trim().split("\\s+".toRegex()).filter { it.isNotEmpty() }
+        return ParametersListUtil.parse(args)
     }
 }
