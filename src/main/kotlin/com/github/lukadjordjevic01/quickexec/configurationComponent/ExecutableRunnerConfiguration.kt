@@ -23,6 +23,7 @@ class ExecutableRunnerConfiguration(
     var customExecutablePath: String = ""
     var programArguments: String = ""
     var workingDirectoryPath: String = project.basePath?: ""
+    var environmentVariables: MutableMap<String, String> = mutableMapOf()
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         ExecutableRunnerConfigurationEditor()
@@ -72,6 +73,8 @@ class ExecutableRunnerConfiguration(
                     }
 
                     withWorkDirectory(workingDirectoryPath.ifEmpty { project.basePath })
+
+                    withEnvironment(environmentVariables)
                 }
 
                 return KillableColoredProcessHandler(commandLine)
@@ -85,6 +88,17 @@ class ExecutableRunnerConfiguration(
         element.setAttribute("customExecutablePath", customExecutablePath)
         element.setAttribute("programArguments", programArguments)
         element.setAttribute("workingDirectory", workingDirectoryPath)
+
+        if (environmentVariables.isNotEmpty()) {
+            val envVarsElement = Element("envs")
+            environmentVariables.forEach { (key, value) ->
+                val envElement = Element("env")
+                envElement.setAttribute("name", key)
+                envElement.setAttribute("value", value)
+                envVarsElement.addContent(envElement)
+            }
+            element.addContent(envVarsElement)
+        }
     }
 
     override fun readExternal(element: Element) {
@@ -100,6 +114,15 @@ class ExecutableRunnerConfiguration(
         }
         element.getAttributeValue("workingDirectory")?.let {
             workingDirectoryPath = it
+        }
+
+        environmentVariables.clear()
+        element.getChild("envs")?.getChildren("env")?.forEach { envElement ->
+            val name = envElement.getAttributeValue("name")
+            val value = envElement.getAttributeValue("value")
+            if (name != null && value != null) {
+                environmentVariables[name] = value
+            }
         }
     }
 
