@@ -1,9 +1,5 @@
 # QuickExec
 
-![Build](https://github.com/lukaDjordjevic01/QuickExec/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-
 A lightweight IntelliJ IDEA plugin that adds a flexible Run/Debug Configuration for executing custom executables with full argument support.
 
 <!-- Plugin description -->
@@ -106,19 +102,19 @@ Working directory: /tmp
 
 ## Installation
 
-- Using the IDE built-in plugin system:
+- Using the IDE built-in plugin system [PLUGIN NOT YET AVAILABLE ON MARKETPLACE]:
 
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "QuickExec"</kbd> >
   <kbd>Install</kbd>
 
-- Using JetBrains Marketplace:
+- Using JetBrains Marketplace [PLUGIN NOT YET AVAILABLE ON MARKETPLACE]:
 
   Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
 
   You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
-- Manually:
+- Manually [ONLY OPTION CURRENTLY]:
 
   Download the [latest release](https://github.com/lukaDjordjevic01/QuickExec/releases/latest) and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
