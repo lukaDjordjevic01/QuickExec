@@ -1,5 +1,6 @@
 package com.github.lukadjordjevic01.quickexec.configurationComponent
 
+import com.intellij.execution.configuration.EnvironmentVariablesComponent
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.options.SettingsEditor
@@ -17,6 +18,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
     private val executablePathField = TextFieldWithBrowseButton()
     private val programArgumentsField = JBTextField()
     private val workingDirectoryField = TextFieldWithBrowseButton()
+    private val environmentVariablesComponent = EnvironmentVariablesComponent()
 
     private val panel: JPanel
     private var currentConfiguration: ExecutableRunnerConfiguration? = null
@@ -73,6 +75,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
             .addLabeledComponent("Executable path:", executablePathField)
             .addLabeledComponent("Program arguments:", programArgumentsField)
             .addLabeledComponent("Working directory:", workingDirectoryField)
+            .addComponent(environmentVariablesComponent)
             .addComponentFillVertically(JPanel(), 0)
             .panel
     }
@@ -96,6 +99,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
 
         programArgumentsField.text = configuration.programArguments
         workingDirectoryField.text = configuration.workingDirectoryPath
+        environmentVariablesComponent.envs = configuration.environmentVariables
         updatePathFieldState()
     }
 
@@ -108,6 +112,8 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
 
         configuration.programArguments = programArgumentsField.text
         configuration.workingDirectoryPath = workingDirectoryField.text
+        configuration.environmentVariables.clear()
+        configuration.environmentVariables.putAll(environmentVariablesComponent.envs)
     }
 
     private fun updatePathFieldState() {
