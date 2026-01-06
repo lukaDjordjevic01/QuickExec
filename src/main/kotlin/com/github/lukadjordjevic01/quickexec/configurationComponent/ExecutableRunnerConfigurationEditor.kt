@@ -16,6 +16,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
     private val executableTypeComboBox = ComboBox(ExecutableRunnerConfiguration.ExecutableType.entries.toTypedArray())
     private val executablePathField = TextFieldWithBrowseButton()
     private val programArgumentsField = JBTextField()
+    private val workingDirectoryField = TextFieldWithBrowseButton()
 
     private val panel: JPanel
     private var currentConfiguration: ExecutableRunnerConfiguration? = null
@@ -41,6 +42,26 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
             }
         }
 
+        val directoryChooserDescriptor = FileChooserDescriptor(
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+        ).withTitle("Select Working Directory")
+            .withDescription("Choose the working directory for the executable")
+
+        workingDirectoryField.addActionListener {
+            FileChooser.chooseFile(
+                directoryChooserDescriptor,
+                null,
+                null
+            ) { file ->
+                workingDirectoryField.text = file.path
+            }
+        }
+
         executableTypeComboBox.addItemListener { event ->
             if (event.stateChange == ItemEvent.SELECTED) {
                 updatePathFieldState()
@@ -51,6 +72,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
             .addLabeledComponent("Executable type:", executableTypeComboBox)
             .addLabeledComponent("Executable path:", executablePathField)
             .addLabeledComponent("Program arguments:", programArgumentsField)
+            .addLabeledComponent("Working directory:", workingDirectoryField)
             .addComponentFillVertically(JPanel(), 0)
             .panel
     }
@@ -73,6 +95,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
         }
 
         programArgumentsField.text = configuration.programArguments
+        workingDirectoryField.text = configuration.workingDirectoryPath
         updatePathFieldState()
     }
 
@@ -84,6 +107,7 @@ class ExecutableRunnerConfigurationEditor : SettingsEditor<ExecutableRunnerConfi
         }
 
         configuration.programArguments = programArgumentsField.text
+        configuration.workingDirectoryPath = workingDirectoryField.text
     }
 
     private fun updatePathFieldState() {
