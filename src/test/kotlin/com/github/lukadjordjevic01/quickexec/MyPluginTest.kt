@@ -1,39 +1,52 @@
 package com.github.lukadjordjevic01.quickexec
 
-import com.intellij.ide.highlighter.XmlFileType
-import com.intellij.openapi.components.service
-import com.intellij.psi.xml.XmlFile
-import com.intellij.testFramework.TestDataPath
+import com.github.lukadjordjevic01.quickexec.configurationComponent.ExecutableRunnerConfiguration
+import com.github.lukadjordjevic01.quickexec.configurationComponent.ExecutableRunnerConfigurationFactory
+import com.github.lukadjordjevic01.quickexec.configurationComponent.ExecutableRunnerConfigurationType
+import com.intellij.execution.configurations.RuntimeConfigurationError
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import com.intellij.util.PsiErrorElementUtil
-import com.github.lukadjordjevic01.quickexec.services.MyProjectService
 
-@TestDataPath("\$CONTENT_ROOT/src/test/testData")
 class MyPluginTest : BasePlatformTestCase() {
 
-    fun testXMLFile() {
-        val psiFile = myFixture.configureByText(XmlFileType.INSTANCE, "<foo>bar</foo>")
-        val xmlFile = assertInstanceOf(psiFile, XmlFile::class.java)
+    fun testConfigurationTypeId() {
+        val configurationType = ExecutableRunnerConfigurationType()
+        assertEquals("EXECUTABLE_RUNNER_CONFIGURATION", configurationType.id)
+    }
 
-        assertFalse(PsiErrorElementUtil.hasErrors(project, xmlFile.virtualFile))
+    fun testConfigurationTypeDisplayName() {
+        val configurationType = ExecutableRunnerConfigurationType()
+        assertEquals("Executable Runner", configurationType.displayName)
+    }
 
-        assertNotNull(xmlFile.rootTag)
+    fun testConfigurationFactoryCreatesCorrectType() {
+        val configurationType = ExecutableRunnerConfigurationType()
+        val factory = ExecutableRunnerConfigurationFactory(configurationType)
+        val configuration = factory.createTemplateConfiguration(project)
 
-        xmlFile.rootTag?.let {
-            assertEquals("foo", it.name)
-            assertEquals("bar", it.value.text)
+        assertTrue(configuration is ExecutableRunnerConfiguration)
+    }
+
+    fun testExecutableTypeHasThreeOptions() {
+        val types = ExecutableRunnerConfiguration.ExecutableType.entries
+        assertEquals(3, types.size)
+    }
+
+    fun testDefaultConfigurationIsCustomType() {
+        val factory = ExecutableRunnerConfigurationFactory(ExecutableRunnerConfigurationType())
+        val configuration = ExecutableRunnerConfiguration(project, factory, "Test")
+
+        assertEquals(ExecutableRunnerConfiguration.ExecutableType.CUSTOM, configuration.executableType)
+    }
+
+    fun testEmptyCustomExecutablePathThrowsError() {
+        val factory = ExecutableRunnerConfigurationFactory(ExecutableRunnerConfigurationType())
+        val configuration = ExecutableRunnerConfiguration(project, factory, "Test")
+
+        configuration.executableType = ExecutableRunnerConfiguration.ExecutableType.CUSTOM
+        configuration.customExecutablePath = ""
+
+        assertThrows(RuntimeConfigurationError::class.java) {
+            configuration.checkConfiguration()
         }
     }
-
-    fun testRename() {
-        myFixture.testRename("foo.xml", "foo_after.xml", "a2")
-    }
-
-    fun testProjectService() {
-        val projectService = project.service<MyProjectService>()
-
-        assertNotSame(projectService.getRandomNumber(), projectService.getRandomNumber())
-    }
-
-    override fun getTestDataPath() = "src/test/testData/rename"
 }
