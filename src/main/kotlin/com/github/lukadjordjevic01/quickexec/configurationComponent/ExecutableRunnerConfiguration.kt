@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
 import org.jdom.Element
 import java.io.File
+import kotlin.io.path.isDirectory
 
 class ExecutableRunnerConfiguration(
     project: Project,
@@ -21,6 +22,7 @@ class ExecutableRunnerConfiguration(
     var executableType: ExecutableType = ExecutableType.CUSTOM
     var customExecutablePath: String = ""
     var programArguments: String = ""
+    var workingDirectoryPath: String = project.basePath?: ""
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         ExecutableRunnerConfigurationEditor()
@@ -69,7 +71,7 @@ class ExecutableRunnerConfiguration(
                         addParameters(parseArguments(programArguments))
                     }
 
-                    withWorkDirectory(project.basePath)
+                    withWorkDirectory(workingDirectoryPath.ifEmpty { project.basePath })
                 }
 
                 return KillableColoredProcessHandler(commandLine)
@@ -82,6 +84,7 @@ class ExecutableRunnerConfiguration(
         element.setAttribute("executableType", executableType.name)
         element.setAttribute("customExecutablePath", customExecutablePath)
         element.setAttribute("programArguments", programArguments)
+        element.setAttribute("workingDirectory", workingDirectoryPath)
     }
 
     override fun readExternal(element: Element) {
@@ -94,6 +97,9 @@ class ExecutableRunnerConfiguration(
         }
         element.getAttributeValue("programArguments")?.let {
             programArguments = it
+        }
+        element.getAttributeValue("workingDirectory")?.let {
+            workingDirectoryPath = it
         }
     }
 
@@ -129,7 +135,7 @@ class ExecutableRunnerConfiguration(
         return null
     }
 
-    
+
     private fun parseArguments(args: String): List<String> {
         return ParametersListUtil.parse(args)
     }
