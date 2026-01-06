@@ -5,3 +5,7 @@
 ## [Unreleased]
 ### Added
 - Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+- Add core plugin functionality
+- Add working directory support
+- Add environment variable support
+- Add immediate verification on executable
