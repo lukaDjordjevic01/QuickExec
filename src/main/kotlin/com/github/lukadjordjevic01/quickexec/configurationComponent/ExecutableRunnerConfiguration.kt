@@ -5,13 +5,11 @@ import com.intellij.execution.configurations.*
 import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.execution.util.ProgramParametersUtil
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
 import org.jdom.Element
 import java.io.File
-import kotlin.io.path.isDirectory
 
 class ExecutableRunnerConfiguration(
     project: Project,
