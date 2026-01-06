@@ -4,26 +4,105 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Adjust the [pluginGroup](./gradle.properties) and [pluginName](./gradle.properties), as well as the [id](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Adjust the plugin description in `README` (see [Tips][docs:plugin-description])
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the `MARKETPLACE_ID` in the above README badges. You can obtain it once the plugin is published to JetBrains Marketplace.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
-- [ ] Configure the [CODECOV_TOKEN](https://docs.codecov.com/docs/quick-start) secret for automated test coverage reports on PRs
+A lightweight IntelliJ IDEA plugin that adds a flexible Run/Debug Configuration for executing custom executables with full argument support.
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+QuickExec provides a simple yet powerful way to run any executable from within your IDE. Whether you need to run system commands, custom build tools, or development utilities, QuickExec makes it easy to configure and execute them directly from IntelliJ IDEA.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
-
-To keep everything working, do not remove `<!-- ... -->` sections. 
+Perfect for developers working with Rust, custom toolchains, or any project requiring quick access to command-line tools.
 <!-- Plugin description end -->
+
+## Features
+
+### 🎯 Core Functionality
+
+- **Predefined Executables**: Quick access to common tools
+  - Rust Compiler (`rustc`) from PATH
+  - Cargo from PATH
+  - Automatic path resolution and validation
+
+- **Custom Executables**: Run any executable on your system
+  - File browser for easy selection
+  - Support for executables in any location
+  - Automatic validation before execution
+
+- **Flexible Arguments**: Full command-line argument support
+  - Proper parsing of quoted strings (e.g., `"hello world"`)
+  - Support for complex argument patterns
+  - Escape sequence handling
+
+- **Working Directory Control**: Execute from any directory
+  - Choose custom working directory
+  - Defaults to project root
+  - File browser for easy selection
+
+### ✨ Advanced Features
+
+- **Path Resolution**: Automatically displays the full path of system executables (rustc/cargo)
+- **Smart Validation**: Pre-execution checks for executable existence and permissions
+- **Persistent Configurations**: Save and reuse configurations across sessions
+
+## Usage
+
+### Creating a Configuration
+
+1. Open **Run → Edit Configurations...**
+2. Click **+** and select **Executable Runner**
+3. Configure your executable:
+
+   **Option 1: Use a predefined executable**
+   - Select `RUSTC` or `CARGO` from the **Executable type** dropdown
+   - The path field shows the resolved location automatically
+   - Add your arguments (e.g., `--version` or `build --release`)
+
+   **Option 2: Use a custom executable**
+   - Select `CUSTOM` from the **Executable type** dropdown
+   - Click **Browse...** to select your executable
+   - Or type the path manually
+   - Add any arguments needed
+
+4. Set the **Working directory** (defaults to project root)
+5. Click **OK** to save
+
+### Running Your Configuration
+
+- Click the **Run** button (▶️) or use `Shift+F10`
+- Output appears in the Run tool window
+- Use the **Stop** button (⏹️) to terminate running processes
+
+## Examples
+
+### Running Rust Compiler
+```
+Executable type:   RUSTC
+Executable path:   /usr/bin/rustc (auto-resolved)
+Arguments:         --version
+Working directory: /path/to/project
+```
+
+### Building with Cargo
+```
+Executable type:   CARGO
+Executable path:   /home/user/.cargo/bin/cargo (auto-resolved)
+Arguments:         build --release
+Working directory: /path/to/project
+```
+
+### Running Custom Scripts
+```
+Executable type:   CUSTOM
+Executable path:   /usr/local/bin/my-tool
+Arguments:         --input "data.txt" --verbose
+Working directory: /path/to/data
+```
+
+### System Commands
+```
+Executable type:   CUSTOM
+Executable path:   /bin/ls
+Arguments:         -lah /tmp
+Working directory: /tmp
+```
 
 ## Installation
 
@@ -43,7 +122,6 @@ To keep everything working, do not remove `<!-- ... -->` sections.
 
   Download the [latest release](https://github.com/lukaDjordjevic01/QuickExec/releases/latest) and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
-
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
